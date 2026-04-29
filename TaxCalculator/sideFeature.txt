@@ -1,0 +1,6 @@
+Deductions- Investment rebate
+            Basic Exemption LimitBDT {  375,000 (General)
+                                        425,000 (Women/Senior)
+                                        500,000 (Disabled)    }
+Method - UpdateRecord()
+
