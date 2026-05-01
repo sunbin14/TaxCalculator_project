@@ -1,0 +1,15 @@
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/bin/Debug/net8.0/TaxCalculator_project
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/bin/Debug/net8.0/TaxCalculator_project.deps.json
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/bin/Debug/net8.0/TaxCalculator_project.runtimeconfig.json
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/bin/Debug/net8.0/TaxCalculator_project.dll
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/bin/Debug/net8.0/TaxCalculator_project.pdb
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/obj/Debug/net8.0/TaxCalculator_project.GeneratedMSBuildEditorConfig.editorconfig
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/obj/Debug/net8.0/TaxCalculator_project.AssemblyInfoInputs.cache
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/obj/Debug/net8.0/TaxCalculator_project.AssemblyInfo.cs
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/obj/Debug/net8.0/TaxCalculator_project.csproj.CoreCompileInputs.cache
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/obj/Debug/net8.0/TaxCalculator_project.sourcelink.json
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/obj/Debug/net8.0/TaxCalculator_project.dll
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/obj/Debug/net8.0/refint/TaxCalculator_project.dll
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/obj/Debug/net8.0/TaxCalculator_project.pdb
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/obj/Debug/net8.0/TaxCalculator_project.genruntimeconfig.cache
+/home/saiful/code_hobe_fonts/Code hobe/C#/TaxCalculator_project/obj/Debug/net8.0/ref/TaxCalculator_project.dll
