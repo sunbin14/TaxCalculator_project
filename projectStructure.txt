@@ -1,0 +1,63 @@
+TaxCalculatorProject/
+│
+├── Program.cs
+│
+├── Core/
+│   ├── TaxSystem.cs
+│   ├── TaxCalculator.cs
+│   ├── TaxRuleEngine.cs
+│   └── ReportGenerator.cs
+│
+├── Models/
+│   ├── TaxPayer.cs
+│   ├── TaxReport.cs
+│   ├── TaxSlab.cs
+│   └── TaxProfile.cs
+│
+├── Deductions/
+│   ├── Deduction.cs                (Abstract Base Class)
+│   ├── MedicalDeduction.cs
+│   ├── EducationDeduction.cs
+│   ├── DonationDeduction.cs
+│   └── MortgageInterestDeduction.cs
+│
+├── Rebates/
+│   ├── InvestmentRebate.cs         (Abstract Base Class)
+│   ├── DPSRebate.cs
+│   ├── InsuranceRebate.cs
+│   ├── RetirementSchemeRebate.cs
+│   └── SavingsCertificateRebate.cs
+│
+├── Services/
+│   ├── DeductionService.cs
+│   ├── RebateService.cs
+│   ├── SlabService.cs
+│   ├── ValidationService.cs
+│   └── InputService.cs
+│
+├── Interfaces/
+│   ├── ITaxCalculator.cs
+│   ├── IDeduction.cs
+│   └── IRebate.cs
+│
+├── Enums/
+│   ├── TaxPayerType.cs
+│   ├── Gender.cs
+|   ├── TaxCalculatorProject
+│   └── DeductionCategory.cs
+│
+├── Data/
+│   ├── TaxConfigurations.cs
+│   ├── DefaultTaxSlabs.cs
+│   └── DeductionLimits.cs
+│
+├── Utilities/
+│   ├── ConsoleHelper.cs
+│   ├── Formatter.cs
+│   └── TaxConstants.cs
+│
+└── Exceptions/
+    ├── InvalidIncomeException.cs
+    ├── InvalidDeductionException.cs
+    ├── InvalidRebateException.cs
+    └── InvalidTaxPayerException.cs
