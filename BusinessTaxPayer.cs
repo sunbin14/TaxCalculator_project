@@ -8,14 +8,14 @@ public class BusinessTaxPayer : TaxPayer
         PayerType = "B";
     }
 
-    public override double CalculateTax()
+    public override void Set_CalculateTax()
     {
-        return GetTaxableIncome() * 0.25;
+        TaxAmount = GetTaxableIncome() * 0.25;
     }
     public override void PrintTaxtierCalculation()
     {
-        Console.WriteLine($"Tax Tier calculation for {Name}:");
-        Console.WriteLine($"Taxable Income: {GetTaxableIncome():C}");
-        Console.WriteLine($"Calculated Tax (flat 25% of taxable income): {GetTaxableIncome() * 0.25:C}");
+        Console.WriteLine(  $"Tax Tier breakdown for {Name}:\n" +
+                            $"Taxable Income: {GetTaxableIncome():C}\n" +
+                            $"Calculated Tax (flat 25% of taxable income): {TaxAmount:C}");
     }
 }

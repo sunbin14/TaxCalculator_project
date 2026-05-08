@@ -50,15 +50,19 @@ void ShowMenu()
             taxSystem.PrintPayersList();
             break;
         case "4":
+            taxSystem.PrintPayersList();
             taxSystem.PrintRecordByID(ReadRequiredString("Enter Record ID: "));
             break;
         case "5":
+            taxSystem.PrintPayersList();
             taxSystem.PrintTaxtierCalculationByID(ReadRequiredString("Enter Record ID: "));
             break;
         case "6":
+            taxSystem.PrintPayersList();
             taxSystem.DeleteRecordByID(ReadRequiredString("Enter Record ID to delete: "));
             break;
         case "7":
+            taxSystem.PrintPayersList();
             taxSystem.UpdateRecordByID(ReadRequiredString("Enter Record ID to update: "));
             break;
         case "8":

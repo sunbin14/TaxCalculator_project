@@ -1,6 +1,22 @@
-Deductions- Investment rebate
+A good tax system should support:
+
+multiple deductions
+maximum deduction limits
+eligibility rules
+different deduction categories
+validation
+
+
+Deductions- Investment tax rebate
             Basic Exemption LimitBDT {  375,000 (General)
                                         425,000 (Women/Senior)
                                         500,000 (Disabled)    }
-Method - UpdateRecord()
+            life insurance premium
+            DPS/retirement schemes
+            Medical expenses
+            Education expenses
+            approved savings certificates
+            some donation categories
+            Mortgage/home loan interest
+Method - UpdateRecord() -> Done
 
