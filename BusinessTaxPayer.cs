@@ -2,8 +2,8 @@ using System;
 
 public class BusinessTaxPayer : TaxPayer
 {
-    public BusinessTaxPayer(string name, double annualIncome, double deductions)
-        : base(name, annualIncome, deductions)
+    public BusinessTaxPayer(string name, double annualIncome)
+        : base(name, annualIncome)
     {
         PayerType = "B";
     }

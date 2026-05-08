@@ -3,9 +3,11 @@ using System;
 public abstract class TaxPayer
 {
     private string _name = string.Empty;
+    
+
     private string _tin = string.Empty;    
     private double _annualIncome;
-    private double _deductions;
+    private double _deductions = 0;
     public double TaxAmount { get; protected set; }
     public string PayerType { get; protected set; } = string.Empty;
 
@@ -19,6 +21,7 @@ public abstract class TaxPayer
             _name = value;
         }
     }
+    
     public double AnnualIncome
     {
         get { return _annualIncome; }
@@ -34,14 +37,14 @@ public abstract class TaxPayer
     public double Deductions
     {
         get { return _deductions; }
-        private set
+        protected set
         {
             if (value < 0)
                 throw new ArgumentException("Deductions cannot be negative.");
             if (value > AnnualIncome)
                 throw new ArgumentException("Deductions cannot exceed annual income.");
-            if (value > 500000)
-                throw new ArgumentException("Deductions cannot exceed 500,000.");
+            if (value > 870000)
+                throw new ArgumentException("Deductions cannot exceed 870,000.");
             _deductions = value;
         }
     }
@@ -51,14 +54,17 @@ public abstract class TaxPayer
         private set { _tin = value; }
     }
 
-    public TaxPayer(string name, double annualIncome, double deductions)
+    public TaxPayer(string name, double annualIncome)
     {
         Name = name;
         AnnualIncome = annualIncome;
-        Deductions = deductions;
         TIN = Random.Shared.NextInt64(100_000_000_000, 999_999_999_999).ToString();
     }
 
+    public virtual void Set_IndividualDetails(string gender, int age, double medical, double education, double mortgage)
+    {
+        Console.WriteLine("NO Individual Details!");
+    }
     public abstract void Set_CalculateTax();
     public abstract void PrintTaxtierCalculation();
     public double GetTaxableIncome()

@@ -15,11 +15,6 @@ public class TaxRecord
         RecordedPayer.Set_CalculateTax();
 
     }
-    
-    // public void UpdateTaxAmount()
-    // {
-    //     TaxAmount = RecordedPayer.CalculateTax();
-    // }
 
     public string GetTaxBreakdown()
     {
@@ -29,6 +24,7 @@ public class TaxRecord
                $"Annual Income: {RecordedPayer.AnnualIncome:C}\n" +
                $"Deductions: {RecordedPayer.Deductions:C}\n" +
                $"Taxable Income: {RecordedPayer.GetTaxableIncome():C}\n" +
+               $"Rebate: {(RecordedPayer is IndividualTaxPayer individual ? individual.Rebate.TotalRebate.ToString("C") : "N/A")}\n" +
                $"Calculated Tax: {RecordedPayer.TaxAmount:C}";
     }
     

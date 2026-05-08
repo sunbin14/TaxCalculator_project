@@ -1,3 +1,6 @@
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+
 public class Input
 {
     public bool Status { get; private set; } = true;
@@ -61,16 +64,35 @@ public class Input
     public void AddTaxRecord()
     {
         string name = GetString("Enter Name: ");
-        double income = GetDouble("Enter Annual Income: ", minValue: 0);
-        double deductions = GetDouble("Enter Deductions: ", minValue: 0);
+        double income = GetDouble("Enter Annual Income: ");
         string type = GetString("Is this an Individual (I) or Business (B) taxpayer? ").ToUpper();
-
         TaxPayer taxPayer = type switch
         {
-            "I" => new IndividualTaxPayer(name, income, deductions),
-            "B" => new BusinessTaxPayer(name, income, deductions),
+            "I" => new IndividualTaxPayer(name, income),
+            "B" => new BusinessTaxPayer(name, income),
             _ => throw new ArgumentException("Invalid taxpayer type. Enter 'I' or 'B'.")
         };
+        double deductions;
+        if (type == "I")
+        {
+            string gender = GetString("Enter Gender (M or F): ").ToUpper();
+            int age = GetInt("Enter Age: ");
+            double medical = GetDouble("Enter Medical Expenses: ");
+            double education = GetDouble("Enter Educational Expenses: ");
+            double mortgage = GetDouble("Enter Mortgage Interest: ");
+            deductions = medical + education + mortgage;
+            taxPayer.Set_IndividualDetails(gender, age, medical, education, mortgage);
+            double lifeInsurance = GetDouble("Enter Life Insurance Premium: ");
+            double dps = GetDouble("Enter DPS Amount: ");
+            double savingsCertificate = GetDouble("Enter Savings Certificate Amount: ");
+            TaxRebate rebate = new TaxRebate(lifeInsurance, dps, savingsCertificate);
+            ((IndividualTaxPayer)taxPayer).SetRebate(rebate);
+        }
+        else if (type == "B")
+        {
+            deductions = GetDouble("Enter Deductions: ");
+            taxPayer.UpdateDeductions(deductions);
+        }
 
         taxSystem.AddRecord(taxPayer);
         Console.WriteLine("Record added successfully.");
@@ -87,7 +109,7 @@ public class Input
         throw new ArgumentException("Input cannot be empty. Please try again.");
     }
 
-    public double GetDouble(string prompt, double minValue = double.MinValue, double maxValue = double.MaxValue)
+    public double GetDouble(string prompt)
     {
         Console.Write(prompt);
         string? input = Console.ReadLine();
@@ -95,11 +117,15 @@ public class Input
         if (!double.TryParse(input, out double value))
             throw new ArgumentException("Invalid number format.");
 
-        if (value < minValue)
-            throw new ArgumentException($"Value must be at least {minValue}.");
+        return value;
+    }
+    public int GetInt(string prompt)
+    {
+        Console.Write(prompt);
+        string? input = Console.ReadLine();
 
-        if (value > maxValue)
-            throw new ArgumentException($"Value cannot exceed {maxValue}.");
+        if (!int.TryParse(input, out int value))
+            throw new ArgumentException("Invalid integer format.");
 
         return value;
     }

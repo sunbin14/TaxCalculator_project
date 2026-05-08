@@ -4,11 +4,59 @@ using System.Security.Cryptography.X509Certificates;
 
 public class IndividualTaxPayer : TaxPayer
 {
+    private int _age;
+    private string _gender = string.Empty;
+
+    public double MedicalExpenses { get; private set; }
+    public double EducationalExpenses { get; private set; }
+    public double MortgageInterest { get; private set; }
+
+    public TaxRebate Rebate { get; private set; }
+    public void SetRebate(TaxRebate rebate)
+    {
+        Rebate = rebate;
+    }
     public double[] Taxtiers {get; private set; } = new double[6];
-    public IndividualTaxPayer(string name, double annualIncome, double deductions)
-        : base(name, annualIncome, deductions)
+
+    public int Age
+    {
+        get { return _age; }
+        set
+        {
+            if (value < 0 || value > 120)
+                throw new ArgumentException("Age must be between 0 and 120.");
+            _age = value;
+        }
+    }
+    public string Gender
+    {
+        get { return _gender; }
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+                throw new ArgumentException("Gender cannot be null or empty.");
+            _gender = value;
+        }
+    }
+
+    public IndividualTaxPayer(string name, double annualIncome)
+        : base(name, annualIncome)
     {
         PayerType = "I";
+    }
+
+    public override void Set_IndividualDetails(string gender, int age, double medical, double education, double mortgage)
+    {
+        Gender = gender;
+        Age = age;
+        if (Gender == "M")
+            Deductions = 375000;
+        if (Gender == "F" || Age >= 65)
+            Deductions += 50000;
+        MedicalExpenses = Math.Min(medical, 120000);
+        EducationalExpenses = Math.Min(education, 80000);
+        MortgageInterest = Math.Min(mortgage, 150000);
+        Deductions += MedicalExpenses + EducationalExpenses + MortgageInterest;
     }
 
     public override void Set_CalculateTax()
@@ -50,18 +98,20 @@ public class IndividualTaxPayer : TaxPayer
             return;}
         Taxtiers[5] = (taxableIncome - 3850000) * 0.3;
         TaxAmount = Taxtiers.Sum();
+        TaxAmount -= Rebate.TotalRebate;
+        if (TaxAmount < 0)
+            TaxAmount = 0;
     }
     public override void PrintTaxtierCalculation()
     {
         Console.WriteLine($"Tax Tier breakdown for {Name}:");
         Console.WriteLine($"Taxable Income: {GetTaxableIncome():C}");
         Console.WriteLine($"Tax for each tier:\n" +
-                          $"Zero Tier (0 - 350,000): {0:C}\n" +
-                          $"First Tier (350,001 - 450,000): {Taxtiers[0]:C}\n" +
-                          $"Second Tier (450,001 - 850,000): {Taxtiers[1]:C}\n" +
-                          $"Third Tier (850,001 - 1,350,000): {Taxtiers[2]:C}\n" +
-                          $"Fourth Tier (1,350,001 - 1,850,000): {Taxtiers[3]:C}\n" +
-                          $"Fifth Tier (1,850,000): {Taxtiers[4]:C}\n" +
-                          $"Sixth Tier (Above 3,850,000): {Taxtiers[5]:C}");
+                          $"Tier-1 (First 100,000): {Taxtiers[0]:C}\n" +
+                          $"Tier-2 (Next 400,000): {Taxtiers[1]:C}\n" +
+                          $"Tier-3 (Next 500,000): {Taxtiers[2]:C}\n" +
+                          $"Tier-4 (Next 500,000): {Taxtiers[3]:C}\n" +
+                          $"Tier-5 (Next 2,000,000): {Taxtiers[4]:C}\n" +
+                          $"Tier-6 (Next remaining): {Taxtiers[5]:C}");
     }
 }
