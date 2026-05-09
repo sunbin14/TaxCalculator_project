@@ -1,0 +1,1 @@
+try throw Argument instead of Print in TaxSystem.

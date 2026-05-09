@@ -3,86 +3,80 @@ using System;
 public abstract class TaxPayer
 {
     private string _name = string.Empty;
-    
-
-    private string _tin = string.Empty;    
+    private string _tin = string.Empty;
     private double _annualIncome;
-    private double _deductions = 0;
-    public double TaxAmount { get; protected set; }
-    public string PayerType { get; protected set; } = string.Empty;
+    private double _deductions;
 
     public string Name
     {
-        get { return _name; }
+        get => _name;
         set
         {
-            if (string.IsNullOrEmpty(value))
-                throw new ArgumentException("Name cannot be null or empty.");
-            _name = value;
+            if (string.IsNullOrWhiteSpace(value))
+                throw new TaxPayerException("Name cannot be null or empty.");
+            _name = value.Trim();
         }
     }
-    
+
+    public string TIN
+    {
+        get => _tin;
+        private set => _tin = value;
+    }
+
+    public string PayerType { get; protected set; } = string.Empty;
+
     public double AnnualIncome
     {
-        get { return _annualIncome; }
+        get => _annualIncome;
         private set
         {
             if (value < 0)
-                throw new ArgumentException("Annual income cannot be negative.");
-            if (value < Deductions)
-                throw new ArgumentException("Annual income cannot be less than deductions.");
+                throw new TaxPayerException("Annual income cannot be negative.");
             _annualIncome = value;
         }
     }
+
     public double Deductions
     {
-        get { return _deductions; }
+        get => _deductions;
         protected set
         {
-            if (value < 0)
-                throw new ArgumentException("Deductions cannot be negative.");
-            if (value > AnnualIncome)
-                throw new ArgumentException("Deductions cannot exceed annual income.");
-            if (value > 870000)
-                throw new ArgumentException("Deductions cannot exceed 870,000.");
-            _deductions = value;
+            _deductions = Math.Min(value, TaxConstants.MaxTotalDeductions);
+            _deductions = Math.Min(_deductions, AnnualIncome);
         }
     }
-    public string TIN
-    {
-        get { return _tin; }
-        private set { _tin = value; }
-    }
 
-    public TaxPayer(string name, double annualIncome)
+    public double TaxAmount { get; protected set; }
+
+    protected TaxPayer(string name, double annualIncome)
     {
         Name = name;
         AnnualIncome = annualIncome;
-        TIN = Random.Shared.NextInt64(100_000_000_000, 999_999_999_999).ToString();
+        TIN = Random.Shared.NextInt64(100_000_000_000L, 999_999_999_999L).ToString();
+        Deductions = 0;
     }
 
-    public virtual void Set_IndividualDetails(string gender, int age, double medical, double education, double mortgage)
-    {
-        Console.WriteLine("NO Individual Details!");
-    }
-    public abstract void Set_CalculateTax();
-    public abstract void PrintTaxtierCalculation();
-    public double GetTaxableIncome()
-    {
-        return AnnualIncome - Deductions;
-    }
+    public double GetTaxableIncome() => AnnualIncome - Deductions;
+
     public void UpdateIncome(double newIncome)
     {
         AnnualIncome = newIncome;
+        Deductions = Deductions;   // Re-apply caps via setter
+        CalculateTax();
     }
 
-    public void UpdateDeductions(double newDeductions)
+    public virtual void UpdateDeductions(double newDeductions)
     {
         Deductions = newDeductions;
+        CalculateTax();
     }
 
-    public void UpdateTaxAmount()
-    {
-        Set_CalculateTax();
-    }
+    // BUG FIX #4 (partial): removed trailing " BDT" here.
+    // TaxRecord.GetTaxBreakdown() is the single place that appends " BDT",
+    // so the display helpers must return the value only — no unit suffix.
+    public virtual string GetDeductionsDisplay() => $"{Deductions:N0}";
+
+    public abstract void CalculateTax();
+    public abstract void PrintTaxTierBreakdown();
 }

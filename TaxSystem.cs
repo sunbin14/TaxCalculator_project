@@ -1,176 +1,140 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// Manages the collection of TaxRecord objects.
+/// Provides full CRUD operations plus reporting and statistics.
+///
+/// Single Responsibility: this class only manages records.
+/// All console I/O for user input is handled in ConsoleUI.
+/// </summary>
 public class TaxSystem
 {
-    private List<TaxRecord> _taxRecords = new List<TaxRecord>();
+    private readonly List<TaxRecord> _records = new();
+
+    // ── CRUD ──────────────────────────────────────────────────────────────────
 
     public void AddRecord(TaxPayer taxPayer)
     {
-        _taxRecords.Add(new TaxRecord(taxPayer));
-    }
-
-    public void PrintAllRecords()
-    {
-        if (_taxRecords.Count == 0)
-        {
-            Console.WriteLine("No records available.");
-            return;
-        }
-        Console.WriteLine("------- All Tax Records -------");
-        foreach (var record in _taxRecords)
-        {
-            Console.WriteLine(record.GetTaxBreakdown());
-            Console.WriteLine(new string('-', 40));
-        }
-    }
-
-    public void PrintPayersList()
-    {
-        if (_taxRecords.Count == 0)
-        {
-            Console.WriteLine("No taxpayers have been added yet.");
-            return;
-        }
-
-        Console.WriteLine("List of Tax Payers:");
-        foreach (var record in _taxRecords)
-        {
-            Console.WriteLine($"Record ID: {record.RecordID}, Name: {record.RecordedPayer.Name}, TIN: {record.RecordedPayer.TIN}");
-        }
-        Console.WriteLine(new string('-', 40));
-    }
-
-    public void PrintRecordByID(string recordID)
-    {
-        if (string.IsNullOrWhiteSpace(recordID))
-        {
-            Console.WriteLine("Record ID cannot be empty.");
-            return;
-        }
-        Console.WriteLine("------- Tax Record Details -------");
-        var record = _taxRecords.FirstOrDefault(r => string.Equals(r.RecordID, recordID.Trim(), StringComparison.OrdinalIgnoreCase));
-        if (record != null)
-            Console.WriteLine(record.GetTaxBreakdown());
-        else
-            Console.WriteLine("No record found for ID: " + recordID);
-    }
-
-    public void PrintTaxtierCalculationByID(string recordID)
-    {
-        if (string.IsNullOrWhiteSpace(recordID))
-        {
-            Console.WriteLine("Record ID cannot be empty.");
-            return;
-        }
-
-        Console.WriteLine("------- Tax Tier Calculation -------");
-        var record = _taxRecords.FirstOrDefault(r => string.Equals(r.RecordID, recordID.Trim(), StringComparison.OrdinalIgnoreCase));
-        if (record != null)
-            record.RecordedPayer.PrintTaxtierCalculation();
-        else
-            Console.WriteLine("No record found for ID: " + recordID);
+        _records.Add(new TaxRecord(taxPayer));
+        Console.WriteLine("Record added successfully.");
     }
 
     public void DeleteRecordByID(string recordID)
     {
-        if (string.IsNullOrWhiteSpace(recordID))
-        {
-            Console.WriteLine("Record ID cannot be empty.");
-            return;
-        }
-        Console.WriteLine("------- Deleting Record -------");
-        var record = _taxRecords.FirstOrDefault(r => string.Equals(r.RecordID, recordID.Trim(), StringComparison.OrdinalIgnoreCase));
-        if (record != null)
-        {
-            _taxRecords.Remove(record);
-            Console.WriteLine("Record with ID " + recordID + " has been deleted.");
-        }
-        else
-        {
-            Console.WriteLine("No record found for ID: " + recordID);
-        }
+        var record = FindRecord(recordID);
+        if (record is null) return;
+        _records.Remove(record);
+        Console.WriteLine($"Record {recordID} deleted successfully.");
     }
 
     public void ClearAllRecords()
     {
-        _taxRecords.Clear();
-        Console.WriteLine("All records have been cleared.");
+        _records.Clear();
+        Console.WriteLine("All records cleared.");
     }
 
-    public void UpdateRecordByID(string recordID)
+    // ── Print / reporting ─────────────────────────────────────────────────────
+
+    public void PrintPayersList()
+    {
+        if (NoRecords()) return;
+        Console.WriteLine("\n--- Tax Payers List ---");
+        Console.WriteLine($"  {"ID",-8} | {"Name",-28} | TIN");
+        Console.WriteLine(new string('-', 55));
+        foreach (var r in _records)
+            Console.WriteLine($"  {r.RecordID,-8} | {r.RecordedPayer.Name,-28} | {r.RecordedPayer.TIN}");
+        Console.WriteLine(new string('-', 55));
+    }
+
+    public void PrintAllRecords()
+    {
+        if (NoRecords()) return;
+        Console.WriteLine("\n======= All Tax Records =======");
+        foreach (var r in _records)
+        {
+            Console.WriteLine(r.GetTaxBreakdown());
+            Console.WriteLine(new string('-', 45));
+        }
+    }
+
+    public void PrintRecordByID(string recordID)
+    {
+        var record = FindRecord(recordID);
+        if (record is null) return;
+        Console.WriteLine("\n--- Tax Record ---");
+        Console.WriteLine(record.GetTaxBreakdown());
+    }
+
+    public void PrintTaxTierBreakdownByID(string recordID)
+    {
+        var record = FindRecord(recordID);
+        if (record is null) return;
+        record.RecordedPayer.PrintTaxTierBreakdown();
+    }
+
+    /// <summary>
+    /// Prints system-wide statistics:
+    /// total tax collected, average, individual vs business count, and top payer.
+    /// </summary>
+    public void PrintStatistics()
+    {
+        if (NoRecords()) return;
+
+        double total    = _records.Sum(r => r.RecordedPayer.TaxAmount);
+        double average  = total / _records.Count;
+        int    indCount = _records.Count(r => r.RecordedPayer is IndividualTaxPayer);
+        int    bizCount = _records.Count - indCount;
+        var    topPayer = _records.OrderByDescending(r => r.RecordedPayer.TaxAmount).First();
+        var    lowPayer = _records.OrderBy(r => r.RecordedPayer.TaxAmount).First();
+
+        Console.WriteLine("\n======= Tax System Statistics =======");
+        Console.WriteLine($"{"Total Records",-28}: {_records.Count}");
+        Console.WriteLine($"{"  Individual Payers",-28}: {indCount}");
+        Console.WriteLine($"{"  Business Payers",-28}: {bizCount}");
+        Console.WriteLine($"{"Total Tax Collected",-28}: {total:N0} BDT");
+        Console.WriteLine($"{"Average Tax Per Payer",-28}: {average:N0} BDT");
+        Console.WriteLine($"{"Highest Tax Payer",-28}: {topPayer.RecordedPayer.Name} " +
+                          $"({topPayer.RecordID}) — {topPayer.RecordedPayer.TaxAmount:N0} BDT");
+        Console.WriteLine($"{"Lowest Tax Payer",-28}: {lowPayer.RecordedPayer.Name} " +
+                          $"({lowPayer.RecordID}) — {lowPayer.RecordedPayer.TaxAmount:N0} BDT");
+        Console.WriteLine(new string('=', 45));
+    }
+
+    // ── Update (interactive — driven by ConsoleUI) ────────────────────────────
+
+    public TaxRecord UpdateRecordByID(string recordID)
+    {
+        return FindRecord(recordID);
+    }
+
+    // ── Private helpers ───────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Finds a record by ID (case-insensitive). Prints a message and returns null if not found.
+    /// </summary>
+    private TaxRecord? FindRecord(string recordID)
     {
         if (string.IsNullOrWhiteSpace(recordID))
         {
-            Console.WriteLine("Record ID cannot be empty.");
-            return;
+            throw new ArgumentException("Record ID cannot be empty.");
         }
 
-        var record = _taxRecords.FirstOrDefault(r => string.Equals(r.RecordID, recordID.Trim(), StringComparison.OrdinalIgnoreCase));
-        if (record == null)
-        {
-            Console.WriteLine("No record found for ID: " + recordID);
-            return;
-        }
+        var record = _records.FirstOrDefault(r =>
+            string.Equals(r.RecordID, recordID.Trim(), StringComparison.OrdinalIgnoreCase));
 
-        Console.WriteLine("---Found---\n" +
-                          $"Name: {record.RecordedPayer.Name}\n" +
-                          $"Annual Income: {record.RecordedPayer.AnnualIncome:C}\n" +
-                          $"Deductions: {record.RecordedPayer.Deductions:C}");
+        if (record is null)
+            throw new ArgumentException($"No record found for ID: {recordID}");
 
-        bool updating = true;
-        while (updating)
-        {
-            Console.Write("\nWhat do you want to update?\n" +
-                          "1. Name\n" +
-                          "2. Annual Income\n" +
-                          "3. Deductions\n" +
-                          "4. Exit\n\n" +
-                          "Choose an option: ");
-            var input = Console.ReadLine();
+        return record;
+    }
 
-            switch (input)
-            {
-                case "1":
-                    Console.Write("Enter new name: ");
-                    var newName = Console.ReadLine()?.Trim();
-                    if (string.IsNullOrEmpty(newName))
-                    {
-                        Console.WriteLine("Name cannot be empty.");
-                        break;
-                    }
-                    record.RecordedPayer.Name = newName;
-                    Console.WriteLine("Name updated successfully.");
-                    break;
-                case "2":
-                    Console.Write("Enter new annual income: ");
-                    if (!double.TryParse(Console.ReadLine(), out double newIncome))
-                    {
-                        Console.WriteLine("Invalid numeric value. Please try again.");
-                        break;
-                    }
-                    record.RecordedPayer.UpdateIncome(newIncome);
-                    record.RecordedPayer.UpdateTaxAmount();
-                    Console.WriteLine("Annual income updated successfully.");
-                    break;
-                case "3":
-                    Console.Write("Enter new deductions: ");
-                    if (!double.TryParse(Console.ReadLine(), out double newDeductions))
-                    {
-                        Console.WriteLine("Invalid numeric value. Please try again.");
-                        break;
-                    }
-                    record.RecordedPayer.UpdateDeductions(newDeductions);
-                    record.RecordedPayer.UpdateTaxAmount();
-                    Console.WriteLine("Deductions updated successfully.");
-                    break;
-                case "4":
-                    updating = false;
-                    break;
-                default:
-                    Console.WriteLine("Invalid option. Please try again.");
-                    break;
-            }
-        }
+    /// <summary>Returns true and prints a message when there are no records.</summary>
+    private bool NoRecords()
+    {
+        if (_records.Count > 0) return false;
+        Console.WriteLine("No records available.");
+        return true;
     }
 }

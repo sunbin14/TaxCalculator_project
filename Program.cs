@@ -1,23 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+// ── Entry Point ───────────────────────────────────────────────────────────────
+// All UI logic is in ConsoleUI; all business logic is in TaxSystem.
+// Program.cs is intentionally minimal.
 
-Input input = new Input();
-TaxSystem taxSystem = new TaxSystem();
-Console.WriteLine("=-=-=-=- Welcome to the Tax Calculator! -=-=-=-=\n" +
-                    "Please select from Menu:");
-while (input.Status)
+Console.WriteLine("=-=-=-=- Welcome to the Tax Calculator! -=-=-=-=");
+
+ConsoleUI ui = new ConsoleUI();
+
+while (ui.IsRunning)
 {
     try
     {
-        input.ShowMenu();
+        ui.ShowMenu();
+    }
+    catch (TaxPayerException ex)
+    {
+        // Domain errors (validation failures, business rules)
+        Console.WriteLine($"\n[Tax Error] {ex.Message}");
     }
     catch (ArgumentException ex)
     {
-        Console.WriteLine("[REJECTED] " + ex.Message);
+        Console.WriteLine($"\n[REJECTED] {ex.Message}");
     }
     catch (Exception ex)
     {
-        Console.WriteLine("An unexpected error occurred: " + ex.Message);
+        // Unexpected / programming errors
+        Console.WriteLine($"\n[Unexpected Error] {ex.Message}");
     }
 }
