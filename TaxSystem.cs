@@ -2,18 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>
-/// Manages the collection of TaxRecord objects.
-/// Provides full CRUD operations plus reporting and statistics.
-///
-/// Single Responsibility: this class only manages records.
-/// All console I/O for user input is handled in ConsoleUI.
-/// </summary>
 public class TaxSystem
 {
     private readonly List<TaxRecord> _records = new();
-
-    // ── CRUD ──────────────────────────────────────────────────────────────────
 
     public void AddRecord(TaxPayer taxPayer)
     {
@@ -34,8 +25,6 @@ public class TaxSystem
         _records.Clear();
         Console.WriteLine("All records cleared.");
     }
-
-    // ── Print / reporting ─────────────────────────────────────────────────────
 
     public void PrintPayersList()
     {
@@ -62,7 +51,6 @@ public class TaxSystem
     public void PrintRecordByID(string recordID)
     {
         var record = FindRecord(recordID);
-        if (record is null) return;
         Console.WriteLine("\n--- Tax Record ---");
         Console.WriteLine(record.GetTaxBreakdown());
     }
@@ -74,10 +62,6 @@ public class TaxSystem
         record.RecordedPayer.PrintTaxTierBreakdown();
     }
 
-    /// <summary>
-    /// Prints system-wide statistics:
-    /// total tax collected, average, individual vs business count, and top payer.
-    /// </summary>
     public void PrintStatistics()
     {
         if (NoRecords()) return;
@@ -102,25 +86,14 @@ public class TaxSystem
         Console.WriteLine(new string('=', 45));
     }
 
-    // ── Update (interactive — driven by ConsoleUI) ────────────────────────────
-
     public TaxRecord UpdateRecordByID(string recordID)
     {
         return FindRecord(recordID);
     }
 
-    // ── Private helpers ───────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Finds a record by ID (case-insensitive). Prints a message and returns null if not found.
-    /// </summary>
+    
     private TaxRecord? FindRecord(string recordID)
     {
-        if (string.IsNullOrWhiteSpace(recordID))
-        {
-            throw new ArgumentException("Record ID cannot be empty.");
-        }
-
         var record = _records.FirstOrDefault(r =>
             string.Equals(r.RecordID, recordID.Trim(), StringComparison.OrdinalIgnoreCase));
 
@@ -130,7 +103,6 @@ public class TaxSystem
         return record;
     }
 
-    /// <summary>Returns true and prints a message when there are no records.</summary>
     private bool NoRecords()
     {
         if (_records.Count > 0) return false;

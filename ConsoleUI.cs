@@ -1,38 +1,24 @@
 using System;
 
-/// <summary>
-/// Handles all console input/output for the Tax Calculator application.
-///
-/// OOP improvement (Single Responsibility Principle):
-///   This class is responsible ONLY for user interaction.
-///   All business logic lives in TaxSystem and the TaxPayer hierarchy.
-///
-/// Key improvement over the original Input class:
-///   Input helpers use retry loops instead of throwing exceptions on bad input.
-///   One typo no longer cancels the entire operation — the user is simply
-///   prompted again.
-/// </summary>
 public class ConsoleUI
 {
     private readonly TaxSystem _taxSystem = new();
     public bool IsRunning { get; private set; } = true;
 
-    // ── Menu ──────────────────────────────────────────────────────────────────
-
     public void ShowMenu()
     {
         Console.WriteLine(
             "\n=========================================" +
-            "\n 1. Add Tax Record"                        +
-            "\n 2. View All Records"                      +
-            "\n 3. View Payers List"                      +
-            "\n 4. View Record by ID"                     +
-            "\n 5. View Tax Tier Breakdown by ID"         +
-            "\n 6. Delete Record by ID"                   +
-            "\n 7. Update Record by ID"                   +
-            "\n 8. Statistics"                            +
-            "\n 9. Clear All Records"                     +
-            "\n 0. Exit"                                  +
+            "\n 1. Add Tax Record" +
+            "\n 2. View All Records" +
+            "\n 3. View Payers List" +
+            "\n 4. View Record by ID" +
+            "\n 5. View Tax Tier Breakdown by ID" +
+            "\n 6. Delete Record by ID" +
+            "\n 7. Update Record by ID" +
+            "\n 8. Statistics" +
+            "\n 9. Clear All Records" +
+            "\n 0. Exit" +
             "\n=========================================");
 
         string choice = PromptString("Enter your choice: ");
@@ -81,20 +67,18 @@ public class ConsoleUI
         }
     }
 
-    // ── Add record flow ───────────────────────────────────────────────────────
-
     private void AddTaxRecord()
     {
-        string name   = PromptString("Enter Name: ");
+        string name = PromptString("Enter Name: ");
         double income = PromptNonNegativeDouble("Enter Annual Income (BDT): ");
-        string type   = PromptChoice("Taxpayer type — Individual (I) or Business (B): ", "I", "B");
+        string type = PromptChoice("Taxpayer type — Individual (I) or Business (B): ", "I", "B");
 
         TaxPayer taxPayer;
 
         if (type == "I")
         {
-            string gender    = PromptChoice("Gender (M / F): ", "M", "F");
-            int    age       = PromptNonNegativeInt("Age: ");
+            string gender = PromptChoice("Gender (M / F): ", "M", "F");
+            int age = PromptNonNegativeInt("Age: ");
             var payer = new IndividualTaxPayer(name, income, gender, age);
             SetupIndividualPayer(payer);
             taxPayer = payer;
@@ -112,14 +96,14 @@ public class ConsoleUI
     private void SetupIndividualPayer(IndividualTaxPayer payer)
     {
         UpdateIndividualDeductions(payer);
-        UpdateIndividualRebates(payer);        
+        UpdateIndividualRebates(payer);
     }
     private void UpdateIndividualDeductions(IndividualTaxPayer payer)
     {
         Console.WriteLine("\n-- Expense Deductions --");
-        double medical   = PromptNonNegativeDouble($"Medical Expenses       (max {TaxConstants.MaxMedicalExpenses:N0} BDT): ");
-        double education = PromptNonNegativeDouble($"Educational Expenses   (max {TaxConstants.MaxEducationalExpenses:N0} BDT): ");
-        double mortgage  = PromptNonNegativeDouble($"Mortgage Interest      (max {TaxConstants.MaxMortgageInterest:N0} BDT): ");
+        double medical = PromptNonNegativeDouble($"Medical Expenses (max {TaxConstants.MaxMedicalExpenses:N0} BDT): ");
+        double education = PromptNonNegativeDouble($"Educational Expenses (max {TaxConstants.MaxEducationalExpenses:N0} BDT): ");
+        double mortgage = PromptNonNegativeDouble($"Mortgage Interest (max {TaxConstants.MaxMortgageInterest:N0} BDT): ");
 
         payer.SetDeductions(new Deductions(medical, education, mortgage));
     }
@@ -127,8 +111,8 @@ public class ConsoleUI
     {
         Console.WriteLine("\n-- Investment Rebate (15% credit on eligible amounts) --");
         double lifeIns = PromptNonNegativeDouble($"Life Insurance Premium (max {TaxConstants.MaxRebatePerCategory:N0} BDT): ");
-        double dps     = PromptNonNegativeDouble($"DPS / Retirement       (max {TaxConstants.MaxRebatePerCategory:N0} BDT): ");
-        double savCert = PromptNonNegativeDouble($"Savings Certificate    (max {TaxConstants.MaxRebatePerCategory:N0} BDT): ");
+        double dps = PromptNonNegativeDouble($"DPS / Retirement (max {TaxConstants.MaxRebatePerCategory:N0} BDT): ");
+        double savCert = PromptNonNegativeDouble($"Savings Certificate (max {TaxConstants.MaxRebatePerCategory:N0} BDT): ");
 
         payer.SetRebate(new TaxRebate(lifeIns, dps, savCert));
     }
@@ -138,29 +122,29 @@ public class ConsoleUI
         double deductions = PromptNonNegativeDouble("Allowable Business Deductions (BDT): ");
         payer.SetBusinessDeductions(deductions);
     }
-    
+
     private void UpdateRecord(TaxRecord taxRecord)
     {
         Console.WriteLine(
             $"\n--- Updating: {taxRecord.RecordedPayer.Name} ({taxRecord.RecordID}) ---\n" +
-            $"Current Income     : {taxRecord.RecordedPayer.AnnualIncome:N0} BDT\n" +
+            $"Current Income : {taxRecord.RecordedPayer.AnnualIncome:N0} BDT\n" +
             $"Current Deductions : {taxRecord.RecordedPayer.Deductions:N0} BDT");
         bool updating = true;
         while (updating)
         {
             Console.Write(
                 "\nWhat to update?\n" +
-                "  1. Name\n"         +
+                "  1. Name\n" +
                 "  2. Annual Income\n" +
-                "  3. Deductions\n"    +
-                "  4. Tax Rebates\n"   +
-                "  5. Back\n"         +
+                "  3. Deductions\n" +
+                "  4. Tax Rebates\n" +
+                "  5. Back\n" +
                 "Choice: ");
 
             switch (Console.ReadLine()?.Trim())
             {
                 case "1":
-                    
+
                     taxRecord.RecordedPayer.Name = PromptString("New Name: ");
                     Console.WriteLine("Name updated.");
                     break;
@@ -202,9 +186,6 @@ public class ConsoleUI
         }
     }
 
-    // ── Input helpers (all retry on bad input — no exceptions thrown to caller) ─
-
-    /// <summary>Prompts until a non-empty string is entered.</summary>
     public string PromptString(string prompt)
     {
         while (true)
@@ -217,7 +198,6 @@ public class ConsoleUI
         }
     }
 
-    /// <summary>Prompts until one of the allowed values is entered (case-insensitive).</summary>
     public string PromptChoice(string prompt, params string[] allowed)
     {
         while (true)
@@ -230,7 +210,6 @@ public class ConsoleUI
         }
     }
 
-    /// <summary>Prompts until a non-negative double is entered.</summary>
     public double PromptNonNegativeDouble(string prompt)
     {
         while (true)
@@ -242,7 +221,6 @@ public class ConsoleUI
         }
     }
 
-    /// <summary>Prompts until a non-negative integer is entered.</summary>
     public int PromptNonNegativeInt(string prompt)
     {
         while (true)

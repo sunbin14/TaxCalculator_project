@@ -62,7 +62,7 @@ public abstract class TaxPayer
     public void UpdateIncome(double newIncome)
     {
         AnnualIncome = newIncome;
-        Deductions = Deductions;   // Re-apply caps via setter
+        Deductions = Deductions;
         CalculateTax();
     }
 
@@ -72,9 +72,6 @@ public abstract class TaxPayer
         CalculateTax();
     }
 
-    // BUG FIX #4 (partial): removed trailing " BDT" here.
-    // TaxRecord.GetTaxBreakdown() is the single place that appends " BDT",
-    // so the display helpers must return the value only — no unit suffix.
     public virtual string GetDeductionsDisplay() => $"{Deductions:N0}";
 
     public abstract void CalculateTax();

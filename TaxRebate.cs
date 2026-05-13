@@ -1,25 +1,20 @@
 using System;
 
-/// <summary>
-/// Represents an investment tax rebate for individual tax payers.
-/// Each investment category is independently capped; the total rebate
-/// is 15% of the sum of eligible investments.
-/// </summary>
 public class TaxRebate
 {
-    public double LifeInsurance      { get; private set; }
-    public double DPS                { get; private set; }
+    public double LifeInsurance { get; private set; }
+    public double DPS { get; private set; }
     public double SavingsCertificate { get; private set; }
-    public double TotalRebate        { get; private set; }
+    public double TotalRebate { get; private set; }
 
     public TaxRebate(double lifeInsurance, double dps, double savingsCertificate)
     {
-        if (lifeInsurance      < 0) throw new TaxPayerException("Life insurance amount cannot be negative.");
-        if (dps                < 0) throw new TaxPayerException("DPS amount cannot be negative.");
+        if (lifeInsurance < 0) throw new TaxPayerException("Life insurance amount cannot be negative.");
+        if (dps < 0) throw new TaxPayerException("DPS amount cannot be negative.");
         if (savingsCertificate < 0) throw new TaxPayerException("Savings certificate amount cannot be negative.");
 
-        LifeInsurance      = Math.Min(lifeInsurance,      TaxConstants.MaxRebatePerCategory);
-        DPS                = Math.Min(dps,                TaxConstants.MaxRebatePerCategory);
+        LifeInsurance = Math.Min(lifeInsurance, TaxConstants.MaxRebatePerCategory);
+        DPS = Math.Min(dps, TaxConstants.MaxRebatePerCategory);
         SavingsCertificate = Math.Min(savingsCertificate, TaxConstants.MaxRebatePerCategory);
 
         TotalRebate = (LifeInsurance + DPS + SavingsCertificate) * TaxConstants.RebateRate;

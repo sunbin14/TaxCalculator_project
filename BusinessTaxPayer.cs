@@ -1,34 +1,21 @@
 using System;
 
-/// <summary>
-/// Represents a business entity tax payer.
-/// Applies a flat 25% tax rate on taxable income
-/// (annual income minus allowable business deductions).
-/// </summary>
 public class BusinessTaxPayer : TaxPayer
 {
-    // ── Constructor ───────────────────────────────────────────────────────────
     public BusinessTaxPayer(string name, double annualIncome)
         : base(name, annualIncome)
     {
         PayerType = "B";
     }
 
-    // ── Setup ─────────────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Sets allowable business deductions (e.g. operating costs, depreciation).
-    /// Validates input before delegating to the base-class property.
-    /// </summary>
     public void SetBusinessDeductions(double deductions)
     {
         if (deductions < 0)
             throw new TaxPayerException("Business deductions cannot be negative.");
-        Deductions = deductions;   // base-class setter applies caps automatically
+        Deductions = deductions;
     } 
 
-    // ── Tax calculation ───────────────────────────────────────────────────────
-
+    
     public override void CalculateTax()
     {
         TaxAmount = GetTaxableIncome() * TaxConstants.BusinessFlatTaxRate;

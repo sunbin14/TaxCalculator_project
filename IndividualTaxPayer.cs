@@ -42,7 +42,7 @@ public class IndividualTaxPayer : TaxPayer
     public void SetRebate(TaxRebate rebate)
     {
         _rebate = rebate ?? throw new TaxPayerException("Rebate cannot be null.");
-        CalculateTax();   // BUG FIX #3: must recalculate so TaxAmount reflects the new rebate
+        CalculateTax();
     }
 
     public void SetDeductions(Deductions deductions)
@@ -63,14 +63,6 @@ public class IndividualTaxPayer : TaxPayer
     public override string GetDeductionsDisplay()
         => _detailedDeductions?.ToString() ?? $"{Deductions:N0}";
 
-    /// <summary>
-    /// BUG FIX #1: Rebate was previously only subtracted in the final slab path.
-    /// All early-return paths exited before the rebate line, so anyone earning
-    /// under ~3.85 M received zero rebate even if they had investments set.
-    ///
-    /// Fix: compute gross tax across all slabs first using a "remaining income"
-    /// approach, then subtract the rebate exactly once at the end.
-    /// </summary>
     public override void CalculateTax()
     {
         Array.Clear(_taxTiers, 0, _taxTiers.Length);
@@ -84,12 +76,11 @@ public class IndividualTaxPayer : TaxPayer
 
         double remaining = income - TaxConstants.TaxFreeLimit;
 
-        // Width of each slab band
-        double w1 = TaxConstants.Slab1Limit - TaxConstants.TaxFreeLimit;  //   100_000
-        double w2 = TaxConstants.Slab2Limit - TaxConstants.Slab1Limit;    //   400_000
-        double w3 = TaxConstants.Slab3Limit - TaxConstants.Slab2Limit;    //   500_000
-        double w4 = TaxConstants.Slab4Limit - TaxConstants.Slab3Limit;    //   500_000
-        double w5 = TaxConstants.Slab5Limit - TaxConstants.Slab4Limit;    // 2_000_000
+        double w1 = TaxConstants.Slab1Limit - TaxConstants.TaxFreeLimit;
+        double w2 = TaxConstants.Slab2Limit - TaxConstants.Slab1Limit;
+        double w3 = TaxConstants.Slab3Limit - TaxConstants.Slab2Limit;
+        double w4 = TaxConstants.Slab4Limit - TaxConstants.Slab3Limit;
+        double w5 = TaxConstants.Slab5Limit - TaxConstants.Slab4Limit;
 
         _taxTiers[0] = Math.Min(remaining, w1) * TaxConstants.Slab1Rate;
         remaining   -= w1;
